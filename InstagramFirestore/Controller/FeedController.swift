@@ -27,6 +27,7 @@ class FeedController: UICollectionViewController {
             //After the user logs out we instanciate a the LoginController and show it as
             //a Full screen modal
             let controller = LoginController()
+            controller.delegate = self.tabBarController as? MainTabController
             let nav = UINavigationController(rootViewController: controller)
             nav.modalPresentationStyle = .fullScreen
             self.present(nav, animated: true, completion: nil)

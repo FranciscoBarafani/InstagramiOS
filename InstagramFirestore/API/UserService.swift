@@ -16,4 +16,12 @@ struct UserService {
             completion(user)
         }
     }
+    
+    static func fetchUsers(completion: @escaping([User]) -> Void){
+        COLLECTION_USERS.getDocuments { (res, error) in
+            guard let res = res else { return }
+            let users = res.documents.map({ User(dictionary: $0.data())})
+            completion(users)
+        }
+    }
 }

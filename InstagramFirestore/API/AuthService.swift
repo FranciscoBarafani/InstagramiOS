@@ -26,7 +26,6 @@ struct AuthService {
                     print("Debug: Failed to register user: \(error.localizedDescription)")
                     return
                 }
-                print("HOLA2")
                 
                 guard let uid = result?.user.uid else { return }
                 

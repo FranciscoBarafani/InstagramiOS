@@ -7,11 +7,18 @@
 
 import UIKit
 
+//Authentication Delegate Protocol
+//Delegates the user fetch to the MainTabController
+protocol AuthenticationDelegate: AnyObject {
+    func authenticationDidComplete()
+}
+
 class LoginController: UIViewController {
     
     //MARK: -Properties
     
     private var viewModel = LoginViewModel()
+    weak var delegate: AuthenticationDelegate?
     
     //UI Elements Creation
     //Icon Image
@@ -76,14 +83,14 @@ class LoginController: UIViewController {
                 print("DEBUG: Failed to log user in: \(error.localizedDescription)")
                 return
             }
-            //If log in is successfull it dismisis the current view controller
-            self.dismiss(animated: true, completion: nil)
+            self.delegate?.authenticationDidComplete()
         }
     }
     
     //Shows Sign Up ViewController
     @objc func handleShowSignUp() {
         let controller = RegistrationController()
+        controller.delegate = delegate
         navigationController?.pushViewController(controller, animated: true)
     }
     

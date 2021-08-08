@@ -72,6 +72,7 @@ class RegistrationController: UIViewController {
     
     //Takes us to the log in screen. Pop goes backwards in the navigation hierarchy
     @objc func handleShowLogin() {
+        print("Tuvieja")
         navigationController?.popViewController(animated: true)
     }
     

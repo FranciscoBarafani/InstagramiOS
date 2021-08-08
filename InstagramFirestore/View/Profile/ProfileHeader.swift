@@ -8,6 +8,10 @@
 import UIKit
 import SDWebImage
 
+protocol ProfileHeaderDelegate: AnyObject {
+    func header(_ profileHeader: ProfileHeader, didTapActionButtonFor uid: User)
+}
+
 class ProfileHeader: UICollectionReusableView {
     
     // MARK: -Properties
@@ -17,6 +21,8 @@ class ProfileHeader: UICollectionReusableView {
             configure()
         }
     }
+    
+    weak var delegate: ProfileHeaderDelegate?
     
     //Labels
     private let profileImageView: UIImageView = {
@@ -143,7 +149,8 @@ class ProfileHeader: UICollectionReusableView {
     // MARK: -Actions
     
     @objc func handleEditProfileFollowTapped(){
-        print("Tapped")
+        guard let viewModel = viewModel else { return }
+        delegate?.header(self, didTapActionButtonFor: viewModel.user)
     }
     
     // MARK: -Helpers
@@ -152,6 +159,9 @@ class ProfileHeader: UICollectionReusableView {
         guard let viewModel = viewModel else { return }
         nameLabel.text = viewModel.fullname
         profileImageView.sd_setImage(with: viewModel.profileImageUrl)
+        editProfileFollowButton.setTitle(viewModel.followButtonText, for: .normal)
+        editProfileFollowButton.setTitleColor(viewModel.followButtonTextColor, for: .normal)
+        editProfileFollowButton.backgroundColor = viewModel.followButtonBackgroundColor
     }
     
     //Lets us add many styles to a text

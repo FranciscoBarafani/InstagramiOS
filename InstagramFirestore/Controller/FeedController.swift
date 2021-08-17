@@ -13,13 +13,22 @@ private let reuseIdentifier = "Cell"
 class FeedController: UICollectionViewController {
     
     // MARK: -Lifecycle
+    private var posts = [Post]()
+    
+    var post: Post?
     
     override func viewDidLoad(){
         super.viewDidLoad()
         configureUI()
+        fetchPosts()
     }
     
     //MARK: -Actions
+    
+    @objc func handleRefresh(){
+        posts.removeAll()
+        fetchPosts()
+    }
     
     @objc func handleLogout(){
         do {
@@ -36,14 +45,32 @@ class FeedController: UICollectionViewController {
         }
     }
     
+    // MARK: -API
+    
+    func fetchPosts() {
+        if post == nil {
+            PostService.fetchPosts { posts in
+                self.posts = posts
+                self.collectionView.refreshControl?.endRefreshing()
+                self.collectionView.reloadData()
+            }
+        }
+    }
+    
     //MARK: -Helpers
     
     func configureUI(){
         collectionView.backgroundColor = .white
         collectionView.register(FeedCell.self, forCellWithReuseIdentifier: reuseIdentifier)
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
+        if post == nil {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
+        }
         
         navigationItem.title = "Feed"
+        
+        let refresher = UIRefreshControl()
+        refresher.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        collectionView.refreshControl = refresher
     }
     
 }
@@ -53,12 +80,17 @@ class FeedController: UICollectionViewController {
 extension FeedController {
     //How many cells to render
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return post != nil ? 1 : posts.count
     }
     
     //Cell configuration, reusable cells uses cells when they are not being seen anyomre
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! FeedCell
+        if let post = post {
+            cell.viewModel = PostViewModel(post: post)
+        } else if posts.count > 0{
+            cell.viewModel = PostViewModel(post: posts[indexPath.row])
+        }
         return cell
     }
 }
